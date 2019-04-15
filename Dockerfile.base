@@ -1,0 +1,19 @@
+FROM aursu/rpmbuild:7-build
+
+USER root
+RUN yum -y install \
+audit-libs-devel \
+gettext-devel \
+libselinux-devel \
+ncurses-devel \
+pam-devel \
+zlib-devel \
+popt-devel \
+libutempter-devel \
+systemd-devel \
+systemd \
+libuser-devel \
+libcap-ng-devel \
+python-devel \
+        gcc \
+    && yum clean all && rm -rf /var/cache/yum

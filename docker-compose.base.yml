@@ -1,0 +1,7 @@
+version: "3.4"
+services:
+  centos7utilbase:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    image: aursu/utilbuild:7-base
