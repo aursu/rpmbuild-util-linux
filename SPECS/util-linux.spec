@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.32.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -426,6 +426,12 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount,smartcols,fdisk}.a
 # temporary remove to avoid conflicts with bash-completion pkg
 rm -f $RPM_BUILD_ROOT%{compldir}/{mount,umount}
 
+# remove files that conflict with sysvinit-tools
+rm -f $RPM_BUILD_ROOT%{_bindir}/{last,mesg,wall}
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/last.1*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/wall.1*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/mesg.1*
+
 # find MO files
 %find_lang %name
 
@@ -561,7 +567,6 @@ fi
 %{_bindir}/ipcs
 %{_bindir}/isosize
 %{_bindir}/kill
-%{_bindir}/last
 %{_bindir}/lastb
 %{_bindir}/logger
 %{_bindir}/look
@@ -573,7 +578,6 @@ fi
 %{_bindir}/lsmem
 %{_bindir}/lsns
 %{_bindir}/mcookie
-%{_bindir}/mesg
 %{_bindir}/more
 %{_bindir}/mountpoint
 %{_bindir}/namei
@@ -595,7 +599,6 @@ fi
 %{_bindir}/utmpdump
 %{_bindir}/uuidgen
 %{_bindir}/uuidparse
-%{_bindir}/wall
 %{_bindir}/wdctl
 %{_bindir}/whereis
 %{_mandir}/man1/cal.1*
@@ -616,7 +619,6 @@ fi
 %{_mandir}/man1/ipcrm.1*
 %{_mandir}/man1/ipcs.1*
 %{_mandir}/man1/kill.1*
-%{_mandir}/man1/last.1*
 %{_mandir}/man1/lastb.1*
 %{_mandir}/man1/logger.1*
 %{_mandir}/man1/login.1*
@@ -626,7 +628,6 @@ fi
 %{_mandir}/man1/lslogins.1*
 %{_mandir}/man1/lsmem.1*
 %{_mandir}/man1/mcookie.1*
-%{_mandir}/man1/mesg.1*
 %{_mandir}/man1/more.1*
 %{_mandir}/man1/mountpoint.1*
 %{_mandir}/man1/namei.1*
@@ -648,7 +649,6 @@ fi
 %{_mandir}/man1/utmpdump.1.gz
 %{_mandir}/man1/uuidgen.1*
 %{_mandir}/man1/uuidparse.1*
-%{_mandir}/man1/wall.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
 %{_mandir}/man5/fstab.5*
@@ -970,6 +970,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Apr 17 2019 Alexander Ursu <alexander.ursu@gmail.com> - 2.32.1-7
+- fix conflict with package sysvinit-tools
+
 * Tue Sep 04 2018 Karel Zak <kzak@redhat.com> 2.32.1-6
 - fix #1624877 - libuuid: name-based UUIDs are not compatible with RFC4122
 
