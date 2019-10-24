@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.32.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -108,6 +108,16 @@ Patch6: 0006-lslogins-return-1-on-lslogins-nonexisting.patch
 # 1624877 - libuuid: name-based UUIDs are not compatible with RFC4122
 Patch7: 0007-libuuid-fix-name-based-UUIDs.patch
 Patch8: 0008-test-update-UUID-v5-tests.patch
+# 1656437 - Failing tests from testsuite
+Patch9: 0009-tests-enlarge-backing-file-for-fstab-btrfs.patch
+Patch10: 0010-tests-make-lsns-netnsid-portable.patch
+Patch11: 0011-tests-break-up-large-strings-for-PySys_WriteStdout.patch
+# 1653781 - unable to umount by loop backing file
+Patch12: 0012-libmount-umount-make-mnt_stat_mountpoin-usable-for-r.patch
+# 1655650 - RHEL8.0 - fdisk -l shows the conflicting partitions name for the mpath
+Patch13: 0013-libfdisk-Fix-multipath-partition-seperators-for-user.patch
+# 1653413 - blkid: add --no-part-details to not return metadata from empty partitions
+Patch14: 0014-blkid-make-PART_ENTRY_-tags-optional-add-no-part-det.patch
 
 
 %description
@@ -121,6 +131,8 @@ program.
 Summary: Partitioning library for fdisk-like programs.
 Group: Development/Libraries
 License: LGPLv2+
+Requires: libuuid = %{version}-%{release}
+Requires: libblkid = %{version}-%{release}
 
 %description -n libfdisk
 This is library for fdisk-like programs, part of util-linux.
@@ -266,6 +278,8 @@ SMP systems.
 Summary: Python bindings for the libmount library
 Group: Development/Libraries
 Requires: libmount = %{version}-%{release}
+Requires: libblkid = %{version}-%{release}
+Requires: libuuid = %{version}-%{release}
 License: LGPLv2+
 
 %description -n %{pypkg}-libmount
@@ -408,7 +422,7 @@ for I in /sbin/sfdisk \
 	%{_mandir}/man8/sfdisk.8* \
 	/sbin/cfdisk \
 	%{_mandir}/man8/cfdisk.8*; do
-	
+
 	rm -f $RPM_BUILD_ROOT$I
 done
 %endif
@@ -520,7 +534,7 @@ fi
 %files -f %{name}.files
 %defattr(-,root,root)
 %doc README NEWS AUTHORS
-%doc Documentation/deprecated.txt 
+%doc Documentation/deprecated.txt
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/*
 %doc misc-utils/getopt-*.{bash,tcsh}
@@ -970,8 +984,17 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
-* Wed Apr 17 2019 Alexander Ursu <alexander.ursu@gmail.com> - 2.32.1-7
+* Wed Apr 17 2019 Alexander Ursu <alexander.ursu@gmail.com> - 2.32.1-8
 - fix conflict with package sysvinit-tools
+
+* Tue Dec 11 2018 Karel Zak <kzak@redhat.com> 2.32.1-8
+- fix #1658206 - improve dependence between subpackages
+
+* Tue Dec 11 2018 Karel Zak <kzak@redhat.com> 2.32.1-7
+- fix #1656437 - Failing tests from testsuite
+- fix #1653781 - unable to umount by loop backing file
+- fix #1655650 - RHEL8.0 - fdisk -l shows the conflicting partitions name for the mpath
+- fix #1653413 - blkid: add --no-part-details to not return metadata from empty partitions
 
 * Tue Sep 04 2018 Karel Zak <kzak@redhat.com> 2.32.1-6
 - fix #1624877 - libuuid: name-based UUIDs are not compatible with RFC4122
@@ -986,7 +1009,7 @@ fi
 - fix #1614843 - Man page of logger is missing -S option
 
 * Wed Aug 08 2018 Karel Zak <kzak@redhat.com> 2.32.1-3
-- refresh lastlog patch 
+- refresh lastlog patch
 - fix #1595882 - wipefs should erase also secondary LUKSv2 header
 
 * Thu Aug  2 2018 Karel Zak <kzak@redhat.com> - 2.32.1-2
@@ -1509,7 +1532,7 @@ fi
 * Wed Jun 30 2010 Karel Zak <kzak@redhat.com> 2.18-1
 - upgrade to the final 2.18
   ftp://ftp.kernel.org/pub/linux/utils/util-linux-ng/v2.18/v2.18-ReleaseNotes
- 
+
 * Fri Jun 18 2010 Karel Zak <kzak@redhat.com> 2.18-0.2
 - upgrade to 2.18-rc2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux-ng/v2.18/v2.18-rc2-ChangeLog
@@ -1577,7 +1600,7 @@ fi
 
 * Mon Oct 19 2009 Karel Zak <kzak@redhat.com> 2.17-0.1.git5e51568
 - upgrade to pre-release snapshot (official changelog not available yet, see
-  http://git.kernel.org/?p=utils/util-linux-ng/util-linux-ng.git for now)  
+  http://git.kernel.org/?p=utils/util-linux-ng/util-linux-ng.git for now)
 - new commands: fallocate, unshare, wipefs
 - libblkid supports topology and partitions probing
 - remove support for --rmpart[s] from blockdev(8) (util-linux-ng-2.14-blockdev-rmpart.patch)
@@ -1639,7 +1662,7 @@ fi
 * Thu Jun  4 2009 Karel Zak <kzak@redhat.com> 2.15.1-0.1
 - upgrade to 2.15.1-rc1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux-ng/v2.15/v2.15-ReleaseNotes
-  ftp://ftp.kernel.org/pub/linux/utils/util-linux-ng/v2.15/v2.15.1-rc1-ChangeLog 
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux-ng/v2.15/v2.15.1-rc1-ChangeLog
 - merged patches:
   util-linux-ng-2.14-login-remote.patch
   util-linux-ng-2.14-fdisk-4k-I.patch
@@ -1655,7 +1678,7 @@ fi
 
 * Thu Apr  2 2009 Karel Zak <kzak@redhat.com> 2.14.2-8
 - fix #490769 - post scriptlet failed (thanks to Dan Horak)
- 
+
 * Fri Mar 20 2009 Karel Zak <kzak@redhat.com> 2.14.2-7
 - fix some nits in mount.tmpfs
 
@@ -1829,7 +1852,7 @@ fi
 - fix #218915 - fdisk -b 4K
 - upgrade to -pre7 release
 - fix building problem with raw0 patch
-- fix #217186 - /bin/sh: @MKINSTALLDIRS@: No such file or directory 
+- fix #217186 - /bin/sh: @MKINSTALLDIRS@: No such file or directory
   (port po/Makefile.in.in from gettext-0.16)
 - sync with FC6 and RHEL5:
 - fix #216489 - SCHED_BATCH option missing in chrt
@@ -1855,7 +1878,7 @@ fi
 
 * Fri Sep 15 2006 Karel Zak <kzak@redhat.com> 2.13-0.41
 - fix #205038 - mount not allowing sloppy option (exports "-s"
-  to external /sbin/mount.nfs(4) calls) 
+  to external /sbin/mount.nfs(4) calls)
 - fix minor bug in util-linux-2.13-mount-twiceloop.patch
 - fix #188193- util-linux should provide plugin infrastructure for HAL
 
@@ -1888,8 +1911,8 @@ fi
 
 * Mon Jul 17 2006 Karel Zak <kzak@redhat.com> 2.13-0.32
 - add IPv6 support to the login command (patch by Milan Zazrivec)
-- fix #198626 - add keyinit instructions to the login PAM script 
-  (patch by David Howells) 
+- fix #198626 - add keyinit instructions to the login PAM script
+  (patch by David Howells)
 
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.31.1
 - rebuild
@@ -1900,7 +1923,7 @@ fi
 * Mon Jul 10 2006 Karsten Hopp <karsten@redhat.de> 2.13-0.30
 - silence install in minimal buildroot without /var/log
 
-* Fri Jul  7 2006 Karel Zak <kzak@redhat.com> 2.13-0.29 
+* Fri Jul  7 2006 Karel Zak <kzak@redhat.com> 2.13-0.29
 - include the raw command for RHELs
 
 * Mon Jun 26 2006 Florian La Roche <laroche@redhat.com> 2.13-0.28
@@ -1922,7 +1945,7 @@ fi
 - fix #191230 - using mount --move results in wrong data in /etc/mtab
 - added mount subtrees support
 - fdisk: wrong number of sectors for large disks (suse#160822)
-- merge fdisk-xvd (#182553) with new fdisk-isfull (#188981) patch 
+- merge fdisk-xvd (#182553) with new fdisk-isfull (#188981) patch
 - fix #181549 - raw(8) manpage has old information about dd
 - remove asm/page.h usage
 
@@ -1975,7 +1998,7 @@ fi
 * Thu Jan 19 2006 Steve Dickson <steved@redhat.com> 2.13-0.14
 - Updated the gssd_check() and idmapd_check(), used with
   nfsv4 mounts, to looked for the correct file in /var/lock/subsys
-  which stops bogus warnings. 
+  which stops bogus warnings.
 
 * Tue Jan  3 2006 Karel Zak <kzak@redhat.com> 2.13-0.13
 - fix #174676 - hwclock audit return code mismatch
@@ -2091,7 +2114,7 @@ fi
 
 * Fri Feb 25 2005 Steve Dickson <SteveD@RedHat.com> 2.12p-2
 - Changed nfsmount to only use reserve ports when necessary
-  (bz# 141773) 
+  (bz# 141773)
 
 * Thu Dec 23 2004 Elliot Lee <sopwith@redhat.com> 2.12p-1
 - Update to util-linux-2.12p. This changes swap header format
@@ -2103,7 +2126,7 @@ fi
 
 * Tue Dec  7 2004 Steve Dickson <SteveD@RedHat.com> 2.12a-20
 - Corrected a buffer overflow problem with nfs mounts.
-  (bz# 141733) 
+  (bz# 141733)
 
 * Wed Dec 01 2004 Elliot Lee <sopwith@redhat.com> 2.12a-19
 - Patches for various bugs.
@@ -2199,8 +2222,8 @@ fi
 - mkcramfs: use PAGE_SIZE for default blocksize (#118681)
 
 * Sat Mar 20 2004 <SteveD@RedHat.com>
-- Updated the nfs-mount.patch to correctly 
-  handle the mounthost option and to ignore 
+- Updated the nfs-mount.patch to correctly
+  handle the mounthost option and to ignore
   servers that do not set auth flavors
 
 * Tue Mar 16 2004 Dan Walsh <dwalsh@RedHat.com> 2.12-13
@@ -2211,7 +2234,7 @@ fi
 - Added two checks to the nfs4 path what will print warnings
   when rpc.idmapd and rpc.gssd are not running
 - Ping NFS v4 servers before diving into kernel
-- Make v4 mount interruptible which also make the intr option on by default 
+- Make v4 mount interruptible which also make the intr option on by default
 
 * Sat Mar 13 2004  <SteveD@RedHat.com>
 - Reworked how the rpc.idmapd and rpc.gssd checks were
@@ -2232,10 +2255,10 @@ fi
 - Tried to make nfs error message a bit more meaninful
 - Cleaned up some warnings
 
-* Sun Mar  7 2004 Steve Dickson <SteveD@RedHat.com> 
+* Sun Mar  7 2004 Steve Dickson <SteveD@RedHat.com>
 - Added pesudo flavors for nfsv4 mounts.
 - Added BuildRequires: libselinux-devel and Requires: libselinux
-  when WITH_SELINUX is set. 
+  when WITH_SELINUX is set.
 
 * Fri Feb 27 2004 Dan Walsh <dwalsh@redhat.com> 2.12-5
 - check for 2.6.3 kernel in mount options
@@ -2264,7 +2287,7 @@ fi
 * Thu Jan 15 2004 Elliot Lee <sopwith@redhat.com> 2.12pre-1
 - 2.12pre-1
 - Merge mount/losetup packages into the main package (#112324)
-- Lose separate 
+- Lose separate
 
 * Mon Nov 3 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-35.sel
 - remove selinux code from login and use pam_selinux
@@ -2402,7 +2425,7 @@ ipcs fixes
 - Include isosize util
 
 * Wed Aug 7 2002  Elliot Lee <sopwith@redhat.com> 2.11r-9
-- Patch120 (skipraid2) to fix #70353, because the original patch was 
+- Patch120 (skipraid2) to fix #70353, because the original patch was
 totally useless.
 
 * Fri Aug 2 2002  Elliot Lee <sopwith@redhat.com> 2.11r-8
@@ -2422,7 +2445,7 @@ totally useless.
 - only require usermode if we're shipping kbdrate here
 
 * Fri Jun 28 2002 Trond Eivind Glomsrod <teg@redhat.com> 2.11r-3
-- Port the large swap patch to new util-linux... the off_t changes 
+- Port the large swap patch to new util-linux... the off_t changes
   now in main aren't sufficient
 
 * Thu Jun 27 2002 Elliot Lee <sopwith@redhat.com> 2.11r-2
@@ -2433,17 +2456,17 @@ totally useless.
 - Remove unused patches
 
 * Thu Jun 27 2002 Elliot Lee <sopwith@redhat.com> 2.11n-19
-- Make a note here that this package was the source of the single change 
-contained in util-linux-2.11f-18 (in 7.2/Alpha), and also contains the 
+- Make a note here that this package was the source of the single change
+contained in util-linux-2.11f-18 (in 7.2/Alpha), and also contains the
 rawman patch from util-linux-2.11f-17.1 (in 2.1AS).
-- Package has no runtime deps on slang, so remove the BuildRequires: 
+- Package has no runtime deps on slang, so remove the BuildRequires:
 slang-devel.
 
 * Fri Jun 21 2002 Tim Powers <timp@redhat.com>
 - automated rebuild
 
 * Thu Jun 20 2002 Elliot Lee <sopwith@redhat.com> 2.11n-17
-- Fix teg's swapondetect patch to not print out the usage message when 
+- Fix teg's swapondetect patch to not print out the usage message when
 'swapon -a -e' is run. (#66690) (edit existing patch)
 - Apply hjl's utmp handling patch (#66950) (patch116)
 - Fix fdisk man page notes on IDE disk partition limit (#64013) (patch117)
@@ -2526,7 +2549,7 @@ slang-devel.
 - Don't make the pivot_root.8 man page executable(!)
 
 * Tue Oct 23 2001 Elliot Lee <sopwith@redhat.com> 2.11f-13
-- Patch/idea #76 from HJL, fixes bug #54741 (race condition in login 
+- Patch/idea #76 from HJL, fixes bug #54741 (race condition in login
 acquisition of controlling terminal).
 
 * Thu Oct 11 2001 Bill Nottingham <notting@redhat.com>
@@ -2899,7 +2922,7 @@ acquisition of controlling terminal).
 * Mon Mar 22 1999 Erik Troan <ewt@redhat.com>
 - added vigr to file list
 
-* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com> 
+* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com>
 - auto rebuild in the new build environment (release 12)
 
 * Thu Mar 18 1999 Cristian Gafton <gafton@redhat.com>
@@ -2982,7 +3005,7 @@ acquisition of controlling terminal).
 - use proper tc*() calls rather then ioctl's
 
 * Sun Dec 21 1997 Cristian Gafton <gafton@redhat.com>
-- fixed a security problem in chfn and chsh accepting too 
+- fixed a security problem in chfn and chsh accepting too
   long gecos fields
 
 * Fri Dec 19 1997 Mike Wangsmo <wanger@redhat.com>
@@ -2998,7 +3021,7 @@ acquisition of controlling terminal).
 - added vfat32 filesystem type to list recognized by fdisk
 
 * Fri Oct 10 1997 Erik Troan <ewt@redhat.com>
-- don't build clock on the alpha 
+- don't build clock on the alpha
 - don't install chkdupexe
 
 * Thu Oct 02 1997 Michael K. Johnson <johnsonm@redhat.com>
